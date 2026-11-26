@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>⚽ 足球资讯</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <button class="menu-btn" id="menuBtn" aria-label="日期列表">☰</button>
+    <div class="brand">
+      <span class="logo">⚽</span>
+      <div>
+        <h1>足球资讯</h1>
+        <p class="sub" id="updated">加载中…</p>
+      </div>
+    </div>
+    <div class="search">
+      <input id="search" type="search" placeholder="搜索…" />
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <h2>📅 日期</h2>
+      <ul id="dateList" class="date-list"></ul>
+    </aside>
+
+    <main class="main">
+      <h2 id="dayTitle" class="day-title">—</h2>
+      <div class="chips" id="tagChips"></div>
+      <section class="list" id="list"></section>
+      <p class="empty" id="empty" hidden>没有内容</p>
+    </main>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

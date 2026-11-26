@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-26",
+  "items": [
+    {
+      "title": "【示例】C罗在联赛中打入一球，个人职业生涯进球数继续刷新",
+      "content": "示例数据，仅用来展示版面。Muse 每天会换成真实资讯：谁、什么时候、发生了什么、关键数据或原话。",
+      "tags": ["C罗", "比赛"],
+      "time": "2026-11-26 01:00",
+      "sources": [
+        { "name": "A Bola", "url": "https://www.abola.pt/" },
+        { "name": "懂球帝", "url": "https://www.dongqiudi.com/" }
+      ]
+    },
+    {
+      "title": "【示例】梅西出席迈阿密国际赛季总结活动",
+      "content": "示例数据。这里写 2~4 句事实摘要，不加评论。",
+      "tags": ["梅西", "生活"],
+      "time": "2026-11-25 20:00",
+      "sources": [
+        { "name": "ESPN", "url": "https://www.espn.com/soccer/" }
+      ]
+    },
+    {
+      "title": "【示例】某球星转会传闻：媒体称俱乐部已开始接触",
+      "content": "示例数据。转会类消息注明是传闻还是官宣，并写清消息出处。",
+      "tags": ["转会", "其他球星"],
+      "time": "",
+      "sources": [
+        { "name": "Marca", "url": "https://www.marca.com/" }
+      ]
+    }
+  ]
+}
