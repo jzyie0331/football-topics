@@ -7,6 +7,7 @@
     { id: "球星专访", cls: "ch-talk" },
     { id: "梅罗对比", cls: "ch-ml" },
     { id: "互怼与争议", cls: "ch-drama" },
+    { id: "花边与恋情", cls: "ch-gossip" },
     { id: "场外与趣闻", cls: "ch-off" },
   ];
   const CH_CLS = Object.fromEntries(CHANNELS.map((c) => [c.id, c.cls]));
@@ -24,6 +25,9 @@
   function getChannel(item) {
     if (item.channel && CH_CLS[item.channel]) return item.channel;
     const text = [item.title, item.quote, ...(item.tags || [])].join(" ");
+    if (/女友|男友|恋情|绯闻|分手|离婚|出轨|约会|妻子|老婆|模特|网红|结婚|求婚|派对|夜店/.test(text)) {
+      return "花边与恋情";
+    }
     if (/谈|评价|盛赞|称赞|高度赞扬|表示|透露/.test(text) && /梅西|C罗|内马尔|哈兰德|姆巴佩|亚马尔|贝林厄姆|维尼修斯/.test(text)) {
       return "名宿谈巨星";
     }
@@ -109,6 +113,7 @@
           ${t._hot ? `<span class="hot-badge">热</span>` : ""}
           ${t.time ? `<span class="time">${esc(t.time.replace(/^\d{4}-/, ""))}</span>` : ""}
         </div>
+        ${t.image ? `<img class="card-img" src="${esc(t.image)}" alt="" loading="lazy" onerror="this.remove()" />` : ""}
         <h3>${esc(t.title)}</h3>
         ${t.quote ? `<blockquote class="quote">“${esc(t.quote)}”</blockquote>` : ""}
         ${t.content ? `<p>${esc(t.content)}</p>` : ""}
@@ -134,6 +139,16 @@
   });
   $("search").addEventListener("input", (e) => { state.q = e.target.value.trim(); render(); });
   $("menuBtn").addEventListener("click", () => $("sidebar").classList.toggle("open"));
+  $("list").addEventListener("click", (e) => {
+    const img = e.target.closest(".card-img");
+    if (!img) return;
+    $("lightboxImg").src = img.src;
+    $("lightbox").hidden = false;
+  });
+  $("lightbox").addEventListener("click", () => { $("lightbox").hidden = true; });
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") $("lightbox").hidden = true;
+  });
   window.addEventListener("hashchange", () => {
     const d = location.hash.slice(1);
     if (state.dates.includes(d) && d !== state.day?.date) loadDay(d);

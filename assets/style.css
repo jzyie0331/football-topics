@@ -140,6 +140,7 @@ a:hover { text-decoration: underline; }
 .ch-talk { background: #dbeafe; color: #1d4ed8; }    /* 球星专访 */
 .ch-ml { background: #fef3c7; color: #b45309; }      /* 梅罗对比 */
 .ch-drama { background: #ffe4e6; color: #be123c; }   /* 互怼与争议 */
+.ch-gossip { background: #fce7f3; color: #be185d; }  /* 花边与恋情 */
 .ch-off { background: #f3e8ff; color: #7e22ce; }     /* 场外与趣闻 */
 
 .hot-badge {
@@ -147,6 +148,12 @@ a:hover { text-decoration: underline; }
   background: #ef4444; color: #fff;
 }
 .time { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+.card-img {
+  width: 100%; max-height: 220px; object-fit: cover;
+  border-radius: 8px; cursor: zoom-in; display: block;
+  background: var(--bg);
+}
 
 .card h3 {
   margin: 0; font-size: 16px; font-weight: 700; line-height: 1.45;
@@ -180,6 +187,19 @@ a:hover { text-decoration: underline; }
 .empty {
   text-align: center; color: var(--muted); padding: 64px 0;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+}
+
+/* 大图预览 */
+.lightbox {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(0, 0, 0, .82);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; cursor: zoom-out;
+}
+.lightbox[hidden] { display: none; }
+.lightbox img {
+  max-width: 92vw; max-height: 90vh; border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .5);
 }
 
 /* 响应式 */
