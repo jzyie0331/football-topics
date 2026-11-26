@@ -1,7 +1,16 @@
 (() => {
   const $ = (id) => document.getElementById(id);
   const WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-  const state = { dates: [], day: null, tag: "全部", q: "" };
+  const CHANNELS = [
+    { id: "全部", cls: "" },
+    { id: "名宿谈巨星", cls: "ch-legend" },
+    { id: "球星专访", cls: "ch-talk" },
+    { id: "梅罗对比", cls: "ch-ml" },
+    { id: "互怼与争议", cls: "ch-drama" },
+    { id: "场外与趣闻", cls: "ch-off" },
+  ];
+  const CH_CLS = Object.fromEntries(CHANNELS.map((c) => [c.id, c.cls]));
+  const state = { dates: [], day: null, channel: "全部", q: "" };
 
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -11,11 +20,28 @@
     return r.json();
   });
 
+  // 兼容旧数据：如果没有 channel 字段或用了旧频道名，自动归类
+  function getChannel(item) {
+    if (item.channel && CH_CLS[item.channel]) return item.channel;
+    const text = [item.title, item.quote, ...(item.tags || [])].join(" ");
+    if (/谈|评价|盛赞|称赞|高度赞扬|表示|透露/.test(text) && /梅西|C罗|内马尔|哈兰德|姆巴佩|亚马尔|贝林厄姆|维尼修斯/.test(text)) {
+      return "名宿谈巨星";
+    }
+    if (/C罗.*梅西|梅西.*C罗|梅罗/.test(text)) return "梅罗对比";
+    if (/质疑|回怼|炮轰|批评|吐槽|怒了|冲突|矛盾|指责|争议/.test(text)) return "互怼与争议";
+    if (/采访|回应|计划|表态|自述/.test(text)) return "球星专访";
+    return "场外与趣闻";
+  }
+
+  function isHot(item) {
+    return Boolean(item.hot) || (item.tags || []).includes("热搜");
+  }
+
   async function init() {
     try {
       const idx = await fetchJSON("data/index.json");
       state.dates = (idx.dates || []).slice().sort().reverse();
-      $("updated").textContent = idx.updated ? `最近更新：${idx.updated}` : "";
+      $("updated").textContent = idx.updated ? `更新于 ${idx.updated}` : "";
     } catch (e) {
       $("updated").textContent = "读取 data/index.json 失败";
       $("empty").hidden = false;
@@ -36,51 +62,74 @@
     history.replaceState(null, "", "#" + date);
     $("sidebar").classList.remove("open");
     try {
-      state.day = await fetchJSON(`data/${date}.json`);
+      const data = await fetchJSON(`data/${date}.json`);
+      const items = (data.items || []).map((t) => ({
+        ...t,
+        _ch: getChannel(t),
+        _hot: isHot(t),
+      }));
+      state.day = { date, items };
     } catch (e) {
       state.day = { date, items: [] };
     }
-    state.tag = "全部";
-    const items = state.day.items || [];
-    $("dayTitle").textContent = `${date} ${weekday(date)} · ${items.length} 条`;
-    const tags = ["全部", ...new Set(items.flatMap((t) => t.tags || []))];
-    $("tagChips").innerHTML = tags.map((t) =>
-      `<button class="chip ${t === state.tag ? "active" : ""}" data-tag="${esc(t)}">${esc(t)}</button>`
-    ).join("");
+    state.channel = "全部";
+    $("dayTitle").textContent = `${date} ${weekday(date)}`;
+    renderChannels();
     render();
+  }
+
+  function renderChannels() {
+    const items = state.day.items || [];
+    const counts = { "全部": items.length };
+    items.forEach((t) => { counts[t._ch] = (counts[t._ch] || 0) + 1; });
+    $("channelBar").innerHTML = CHANNELS.map((c) => {
+      const n = counts[c.id] || 0;
+      return `<button class="ch-tab ${c.id === state.channel ? "active" : ""}" data-ch="${esc(c.id)}">
+        ${esc(c.id)}<span class="cnt">${n}</span>
+      </button>`;
+    }).join("");
   }
 
   function render() {
     let list = state.day.items || [];
-    if (state.tag !== "全部") list = list.filter((t) => (t.tags || []).includes(state.tag));
+    if (state.channel !== "全部") list = list.filter((t) => t._ch === state.channel);
     if (state.q) {
       const q = state.q.toLowerCase();
-      list = list.filter((t) => [t.title, t.content, ...(t.tags || [])].join(" ").toLowerCase().includes(q));
+      list = list.filter((t) =>
+        [t.title, t.quote, t.content, t._ch, ...(t.tags || [])].join(" ").toLowerCase().includes(q));
     }
+    $("dayCount").textContent = `共 ${list.length} 条`;
     $("empty").hidden = list.length > 0;
-    $("empty").textContent = "没有内容";
-    $("list").innerHTML = list.map((t) => `
-      <article class="item">
-        <h3>${esc(t.title)}</h3>
-        ${t.content ? `<p>${esc(t.content)}</p>` : ""}
-        <div class="meta">
-          ${(t.tags || []).map((g) => `<span class="tag">${esc(g)}</span>`).join("")}
-          ${t.time ? `<span class="time">${esc(t.time)}</span>` : ""}
-          ${(t.sources || []).map((s) =>
-            `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name || "来源")}</a>`).join("")}
+    $("list").innerHTML = list.map((t) => {
+      const cleanTags = (t.tags || []).filter((g) => g !== t._ch && g !== "热搜").slice(0, 3);
+      return `
+      <article class="card ${t._hot ? "hot" : ""}">
+        <div class="card-top">
+          <span class="ch-badge ${CH_CLS[t._ch] || ""}">${esc(t._ch)}</span>
+          ${t._hot ? `<span class="hot-badge">热</span>` : ""}
+          ${t.time ? `<span class="time">${esc(t.time.replace(/^\d{4}-/, ""))}</span>` : ""}
         </div>
-      </article>`).join("");
+        <h3>${esc(t.title)}</h3>
+        ${t.quote ? `<blockquote class="quote">“${esc(t.quote)}”</blockquote>` : ""}
+        ${t.content ? `<p>${esc(t.content)}</p>` : ""}
+        <div class="card-foot">
+          <div class="tags">${cleanTags.map((g) => `<span class="tag">${esc(g)}</span>`).join("")}</div>
+          <div class="sources">${(t.sources || []).map((s) =>
+            `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name || "来源")}</a>`).join("")}</div>
+        </div>
+      </article>`;
+    }).join("");
   }
 
   $("dateList").addEventListener("click", (e) => {
     const li = e.target.closest("li");
     if (li) loadDay(li.dataset.d);
   });
-  $("tagChips").addEventListener("click", (e) => {
-    const c = e.target.closest(".chip");
-    if (!c) return;
-    state.tag = c.dataset.tag;
-    document.querySelectorAll(".chip").forEach((x) => x.classList.toggle("active", x === c));
+  $("channelBar").addEventListener("click", (e) => {
+    const btn = e.target.closest(".ch-tab");
+    if (!btn) return;
+    state.channel = btn.dataset.ch;
+    document.querySelectorAll(".ch-tab").forEach((x) => x.classList.toggle("active", x === btn));
     render();
   });
   $("search").addEventListener("input", (e) => { state.q = e.target.value.trim(); render(); });

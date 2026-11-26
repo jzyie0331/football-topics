@@ -2,7 +2,7 @@
 
 每天由 Muse 自动收集整理当天足球圈热门资讯（C罗、梅西必收，其他球星、联赛、转会、国足等按热度收），网页上按日期浏览。只收集事实，不做标题和选题策划。
 
-- 在线地址：`https://你的用户名.github.io/football-topics/`
+- 在线地址：https://jzyie0331.github.io/football-topics/
 - 数据目录：[`data/`](data/)，每天一个 JSON 文件
 
 ## 上线步骤

@@ -8,30 +8,35 @@
 </head>
 <body>
   <header class="topbar">
-    <button class="menu-btn" id="menuBtn" aria-label="日期列表">☰</button>
-    <div class="brand">
-      <span class="logo">⚽</span>
-      <div>
-        <h1>足球资讯</h1>
-        <p class="sub" id="updated">加载中…</p>
+    <div class="topbar-inner">
+      <button class="menu-btn" id="menuBtn" aria-label="日期列表">☰</button>
+      <div class="brand">
+        <span class="logo">⚽</span>
+        <div>
+          <h1>足球资讯</h1>
+          <p class="sub" id="updated">加载中…</p>
+        </div>
+      </div>
+      <div class="search">
+        <input id="search" type="search" placeholder="搜索球星、名宿或关键词…" />
       </div>
     </div>
-    <div class="search">
-      <input id="search" type="search" placeholder="搜索…" />
-    </div>
+    <nav class="channel-bar" id="channelBar" aria-label="频道导航"></nav>
   </header>
 
   <div class="layout">
     <aside class="sidebar" id="sidebar">
-      <h2>📅 日期</h2>
+      <h2>日期归档</h2>
       <ul id="dateList" class="date-list"></ul>
     </aside>
 
     <main class="main">
-      <h2 id="dayTitle" class="day-title">—</h2>
-      <div class="chips" id="tagChips"></div>
-      <section class="list" id="list"></section>
-      <p class="empty" id="empty" hidden>没有内容</p>
+      <div class="day-head">
+        <h2 id="dayTitle">—</h2>
+        <span class="day-count" id="dayCount"></span>
+      </div>
+      <section class="grid" id="list"></section>
+      <p class="empty" id="empty" hidden>这个频道今天没有内容</p>
     </main>
   </div>
 
